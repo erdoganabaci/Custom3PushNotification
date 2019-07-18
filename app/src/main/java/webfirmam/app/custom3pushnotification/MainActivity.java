@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 if (customKey != null)
                     Log.i("OneSignalExample", "customkey set with value: " + customKey);
             }
-            Intent intent = new Intent(getApplicationContext(), SendPushNotification.class);
-            intent.putExtra("dataUrl",myurl);
+            //Intent intent = new Intent(getApplicationContext(), SendPushNotification.class);
+            //intent.putExtra("dataUrl",myurl);
 
             //startActivity(intent);
         }
@@ -244,12 +244,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            if (data != null) {
+            if (!myurl.equals("")) {
 
                 Intent intent = new Intent(getApplicationContext(), Main2Activity.class);
                 intent.putExtra("dataUrl",myurl);
                 startActivity(intent);
 
+            }else if (myurl.equals("")){
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
             }
 
 
