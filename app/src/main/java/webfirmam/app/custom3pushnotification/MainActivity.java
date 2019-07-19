@@ -1,6 +1,7 @@
 package webfirmam.app.custom3pushnotification;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -39,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
     Handler handler = new Handler();
     FirebaseDatabase database;
     DatabaseReference databaseReference;
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().hide();
 
        /* OneSignal.startInit(this)
                 .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 .unsubscribeWhenNotificationsAreDisabled(true)
                 .init();
 */
+
         OneSignal.startInit(this)
                 .setNotificationReceivedHandler(new ExampleNotificationReceivedHandler())
                 .setNotificationOpenedHandler(new ExampleNotificationOpenedHandler())
@@ -243,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
             myurl = data.optString("myurl", null);
 
 
-
             if (!myurl.equals("")) {
 
                 Intent intent = new Intent(getApplicationContext(), Main2Activity.class);
@@ -271,7 +274,16 @@ public class MainActivity extends AppCompatActivity {
             if(!mProgressDialog.isShowing())//mProgressDialog açık mı kontrol ediliyor
             {
 
-                mProgressDialog.show();//mProgressDialog açık değilse açılıyor yani gösteriliyor ve yükleniyor yazısı çıkıyor
+                    try{
+                        //show dialog
+                        mProgressDialog.show();//mProgressDialog açık değilse açılıyor yani gösteriliyor ve yükleniyor yazısı çıkıyor
+
+                    }catch (Exception e){
+                       e.printStackTrace();
+                    }
+
+
+
                 handler.postDelayed(new Runnable() {
                     public void run() {
                         mProgressDialog.dismiss();
@@ -315,9 +327,22 @@ public class MainActivity extends AppCompatActivity {
     {
         if(webView.canGoBack()){//eğer varsa bir önceki sayfaya gidecek
             webView.goBack();
-        }else{//Sayfa yoksa uygulamadan çıkacak
+        }else if (doubleBackToExitPressedOnce){//Sayfa yoksa uygulamadan çıkacak
             super.onBackPressed();
+
+            return;
         }
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Çıkmak için 2 kere basınız.", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
+
 
 }

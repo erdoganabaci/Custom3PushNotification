@@ -11,6 +11,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,10 +34,15 @@ public class Main2Activity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference databaseReference;
     TextView textViewUrl;
+    boolean doubleBackToExitPressedOnce = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        getSupportActionBar().hide();
+
+
         Intent intent = getIntent();
         String launcUrl = intent.getStringExtra("pushUrl");
         String dataUrl = intent.getStringExtra("dataUrl");
@@ -61,7 +67,7 @@ public class Main2Activity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference();
     }
-
+/*
     public void sendNotification(View view){
 
         DatabaseReference newReference = database.getReference("PlayerIDs");
@@ -99,7 +105,7 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
     }
-
+*/
     private class CustomWebViewClient extends WebViewClient {
 
         //Alttaki methodların hepsini kullanmak zorunda deilsiniz
@@ -111,10 +117,20 @@ public class Main2Activity extends AppCompatActivity {
             if(!mProgressDialog.isShowing())//mProgressDialog açık mı kontrol ediliyor
             {
 
-                mProgressDialog.show();//mProgressDialog açık değilse açılıyor yani gösteriliyor ve yükleniyor yazısı çıkıyor
+                try{
+                    mProgressDialog.show();//mProgressDialog açık değilse açılıyor yani gösteriliyor ve yükleniyor yazısı çıkıyor
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        mProgressDialog.dismiss();
+                        try {
+                            mProgressDialog.dismiss();
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }, 5000);
 
@@ -127,7 +143,12 @@ public class Main2Activity extends AppCompatActivity {
             super.onPageFinished(view, url);
 
             if(mProgressDialog.isShowing()){//mProgressDialog açık mı kontrol açıksa kapat ama sayfa yüklenmesi tamalanırsa
-                mProgressDialog.dismiss();//mProgressDialog açıksa kapatılıyor
+                try {
+                    mProgressDialog.dismiss();//mProgressDialog açıksa kapatılıyor
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -155,9 +176,20 @@ public class Main2Activity extends AppCompatActivity {
     {
         if(webView.canGoBack()){//eğer varsa bir önceki sayfaya gidecek
             webView.goBack();
-        }else{//Sayfa yoksa uygulamadan çıkacak
+        }else if (doubleBackToExitPressedOnce){//Sayfa yoksa uygulamadan çıkacak
             super.onBackPressed();
+            return;
         }
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Çıkmak için 2 kere basınız.", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
 
 }

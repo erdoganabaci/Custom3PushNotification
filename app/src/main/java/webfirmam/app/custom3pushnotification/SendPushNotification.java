@@ -1,10 +1,12 @@
 package webfirmam.app.custom3pushnotification;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,6 +56,9 @@ public class SendPushNotification extends AppCompatActivity {
             NavUtils.navigateUpTo(this,intent);
             //olsada olur return true olmasa da olur
             //return true;
+        }else if (item.getItemId() == R.id.kill_app){
+            finishAffinity();
+            System.exit(0);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -71,6 +76,8 @@ public class SendPushNotification extends AppCompatActivity {
         //home geri menu tuşu aktifleştirme önemli!!!!
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Intent intent = new Intent(this,MyService.class);
+        startService(intent);
         //Intent intent = new Intent(this,MyService.class);
         //startService(intent);
         //idleri databaseye mainactivity de ekliyom zaten.
@@ -128,7 +135,7 @@ public class SendPushNotification extends AppCompatActivity {
                     String playerID = hashMap.get("playerID");
 
                     System.out.println("playerID server:" + playerID);
-
+/*
                     try {
                         //OneSignal.postNotification(new JSONObject("{'headings':{'en':'finalPageTitle'},'contents': {'en':'Everyone'}, 'include_player_ids': ['" + playerID + "']}"), null);
                         //OneSignal.postNotification(new JSONObject("{'headings':{'en':'"+pushTitleText.getText().toString()+"'},'contents': {'en':'"+pushContentText.getText().toString()+"'}, 'include_player_ids': ['" + playerID + "']}"), null);
@@ -136,8 +143,26 @@ public class SendPushNotification extends AppCompatActivity {
 
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }
+                    }*/
+                    try {
+                        OneSignal.postNotification(new JSONObject("{'headings':{'en':'"+pushTitleText.getText().toString()+"'},'contents': {'en':'"+pushContentText.getText().toString()+"'}, 'data': {'myurl': '"+pushContentUrl.getText().toString()+"'},'include_player_ids': ['" + playerID + "']}"),
 
+                                new OneSignal.PostNotificationResponseHandler() {
+                                    @Override
+                                    public void onSuccess(JSONObject response) {
+                                        Log.i("OneSignalExample", "postNotification Success: " + response.toString());
+                                        Toast.makeText(SendPushNotification.this,"Bildirim Gönderildi...",Toast.LENGTH_LONG).show();
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(JSONObject response) {
+                                        Log.e("OneSignalExample", "postNotification Failure: " + response.toString());
+                                    }
+                                });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
